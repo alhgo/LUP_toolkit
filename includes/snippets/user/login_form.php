@@ -1,7 +1,9 @@
 	<!-- Modal Header -->
 	<div class="modal-header">
 		<h4>Formulario de inicio de sesión</h4>
+		<?php if(!isset($_GET['action']) ||  $_GET['action'] != 'loginUser') : ?>
 		<button type="button" class="close" data-dismiss="modal">&times;</button>
+		<?php endif ?>
 	</div>
 	<!-- Modal body -->
     <div class="modal-body">

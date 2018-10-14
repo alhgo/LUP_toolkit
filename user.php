@@ -46,27 +46,27 @@ switch($action) {
 
 	if($action == 'register')
 	{
-		snippet('user_register_form.php');
+		snippet('user/user_register_form.php');
 	}
 	else if($action == 'registerUser')
 	{
-		snippet('user_register.php', array('user'=>$user));
+		snippet('user/user_register.php', array('user'=>$user));
 	}
 	else if($action == 'confirmUser')
 	{
-		snippet('user_confirm.php', array('user'=>$user));
+		snippet('user/user_confirm.php', array('user'=>$user));
 	}
 	else if($action == 'loginUser')
 	{
-		snippet('login_form.php', array('user'=>$user));
+		snippet('user/login_form.php', array('user'=>$user));
 	}
 	else if($action == 'rememberPass')
 	{
-		snippet('user_remember.php');
+		snippet('user/user_remember.php');
 	}
 	else
 	{
-		snippet('user_data.php', array('user' => $user));
+		snippet('user/user_data.php', array('user' => $user));
 	}
 
  ?>

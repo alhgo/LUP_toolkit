@@ -6,6 +6,12 @@ require_once('includes/toolkit.php');
 $user = new Users;
 $site = new Site;
 
+//Si el usuario no es administrador, lo sacamos de la página
+if(!$user->logged || !$user->is_admin) {
+	url::go('logout.php?error=no_admin');
+}
+
+
 ?>
 
 <?php snippet('header.php', ['site' => $site]); ?>
@@ -16,13 +22,11 @@ $site = new Site;
 
 	<div class="container-fluid p-0 m-0">
 		
-		<?php snippet('breadcrumb.php',array('data' => ['Inicio' => 'index.php'])); ?>
+		<?php snippet('breadcrumb.php',array('data' => ['Admin' => 'admin.php'])); ?>
 	</div>
 	<div class="container">
 		
-		<?php snippet('home.php'); ?>
-
-		<?php if(c::get('use.database') && !$user->logged) snippet('user/login_form_modal.php'); ?>
+		<?php snippet('admin/admin_home.php'); ?>
 
 	</div>
 	

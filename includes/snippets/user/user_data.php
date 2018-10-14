@@ -35,10 +35,6 @@ if(isset($_POST['update_user_data']))
 	
 }
 
-//Categorías de las marcas
-$map = new map;
-$cats = $map->getCats();
-
 
 ?>
 
@@ -80,7 +76,7 @@ $cats = $map->getCats();
 			</div>
 		  </div>
 		  <div class="form-group row">
-			<label for="user-birth" class="col-sm-4 col-form-label"><strong>Nombre</strong></label>
+			<label for="user-birth" class="col-sm-4 col-form-label"><strong>Año de nacimiento</strong></label>
 			<div class="col-sm-8">
 			  	
 			  	<select class="form-control" disabled id="user-birth" name="user-birth">
@@ -107,23 +103,7 @@ $cats = $map->getCats();
 		  </div>
 		</form>
 		<hr>
-		<h1 class="display-4">Notificaciones</h1>
-		<p>Recibir notificaciones cuando se añaden o cambien marcas en las siguientes categorías</p>  
-		  <?php foreach ($cats AS $cat) : ?>
-		  <div class="form-group row bg-light">
-			<label for="check<?php echo $cat['id_cat'] ?>" class="col-sm-10 col-form-label ">
-				<img src="images/cat_icons/<?php echo $cat['icon'] ?>" alt="<?php echo $cat['name'] ?>" title="<?php echo $cat['name'] ?>">
-				&nbsp;<?php echo $cat['name'] ?>
-			</label>
-			<div class="col-sm-2 my-auto">
-			  <label class="switch">
-				  <input type="checkbox" class="cat_check" id="check<?php echo $cat['id_cat'] ?>" value="<?php echo $cat['id_cat'] ?>" <?php echo (in_array($cat['id_cat'],$user_data['cats_notice'])) ? 'checked' : '' ?>>
-				  <span class="slider round"></span>
-				</label>
-			</div>
-		  </div>
-		<?php endforeach ?>
-	
+		
 	
 	
 	</div>

@@ -61,21 +61,27 @@ if(file_exists(dirname(__FILE__).'/config.'.$_SERVER['SERVER_NAME'].'.php'))
 }
 
 /*TEST MYSQL*/
-/*
-if(!$db = new MysqliDb (Array (
-		'host' => c::get('db.host'),
-		'username' => c::get('db.username'), 
-		'password' => c::get('db.password'),
-		'db'=> c::get('db.database'),
-		'port' => c::get('db.port'),
-		'prefix' => '',
-		'charset' => 'utf8'))
-   )
+if(c::get('use.database'))
 {
-	die('Se ha producido un problema al conectar con la base de datos');
+	if(!$db = new MysqliDb (Array (
+			'host' => c::get('db.host'),
+			'username' => c::get('db.username'), 
+			'password' => c::get('db.password'),
+			'db'=> c::get('db.database'),
+			'port' => c::get('db.port'),
+			'prefix' => '',
+			'charset' => 'utf8'))
+	   )
+	{
+		die('Se ha producido un problema al conectar con la base de datos');
+	}
+	else{
+		//Comprobamos que la tabla de base de datos existe
+		if(!$db->get('users')) {
+			die('La base de datos no está correctamente configurada: ' . $db->getLastError());
+		}
+		$db->disconnect();
+	}
 }
-else{
-	$db->disconnect();
-}
-*/
+
 ?>

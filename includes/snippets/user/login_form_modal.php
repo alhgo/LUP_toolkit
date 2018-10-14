@@ -6,7 +6,7 @@
     <div class="modal-content">
 
         
-		  <?php snippet('login_form.php') ?>
+		  <?php snippet('user/login_form.php') ?>
 
       
     </div>

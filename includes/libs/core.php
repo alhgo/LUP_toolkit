@@ -67,9 +67,12 @@ class Site
 		$this->auth = c::get('site.auth');
 	}
 	
-	//var $conf = new c();
-	//public $title = c::get('site_title');
-	//
+	//Ir a una página específica del sitio
+	public function go($page)
+	{
+		header("Location:" . c::get('site.url') . '/' . $page);
+  		exit();
+	}
 	
 	
 }
@@ -201,15 +204,6 @@ class Users
 		$db = $this->db;
 		$db->where ("id_user", $id);
 		$user = $db->getOne ("users");
-		
-		//Obtenemos las categorías activadas para recibir avisos
-		$db->where("id_user",$id);
-		$cats = $db->get("users_cats_notice");
-		$user['cats_notice'] = array();
-		foreach($cats AS $val)
-		{
-			$user['cats_notice'][] = $val['id_cat'];
-		}
 	
 		return $user;
 	}
@@ -538,6 +532,12 @@ class Users
 		$db->where ('id_user', $id_user);
 		$db->update ('users', $data);
 		
+	}
+	
+	public function destroyCookie()
+	{
+		$cookiename = c::get('cookie.user');
+		setcookie($cookiename, null, time() - 3600, "/");
 	}
 	
 	

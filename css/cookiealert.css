@@ -14,9 +14,9 @@
 }
 
 .cookiealert.show {
-    opacity: 1;
+    opacity: 0.9;
     transform: translateY(0%);
-    transition-delay: 1000ms;
+    transition-delay: 750ms;
 }
 
 .cookiealert a {
