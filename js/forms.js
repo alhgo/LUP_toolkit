@@ -1,11 +1,11 @@
 // JavaScript Document
 
 /*PLaceholder Label Animation: https://codepen.io/nathanlong/pen/kkLKrL */
-$('input').focus(function(){
+$('input').focus(function() {
   $(this).parents('.form-group').addClass('focused');
 });
 
-$('input').blur(function(){
+$('input').blur(function() {
   var inputValue = $(this).val();
   if ( inputValue == "" ) {
     $(this).removeClass('filled');
@@ -264,6 +264,10 @@ window.onload = function() {
 
 	});
 	
+    //Formulario de contacto
+	$( "#contact-button" ).click(function(event) {
+		console.log('Enviado formulario de contacto');
+	});
 	
 	/*** REGISTER FORM VALIDATION ***/
 	//Función que marca los campos como válidos o inválidos en el formulario de registro
@@ -547,7 +551,7 @@ window.onload = function() {
 
 	/*** USER DATA ***/
 	$( "#user-edit" ).click(function() {
-		
+		console.log('hola');
 	    if( $('#user-edit').prop('checked') ) 
 		{
 			$('#user-email,#user-name,#user-pass').removeClass('form-control-plaintext');
@@ -559,8 +563,8 @@ window.onload = function() {
 		}
 		else
 		{
-			$('#user-email,#user-name').removeClass('form-control');
-			$('#user-email,#user-name').addClass('form-control-plaintext');
+			$('#user-email,#user-name,#user-pass').removeClass('form-control');
+			$('#user-email,#user-name,#user-pass').addClass('form-control-plaintext');
 			$('#user-pass').val('1234');
 			$('#passwordHelpInline').slideUp();
 			$('#user-birth').attr("disabled", true);
@@ -570,6 +574,7 @@ window.onload = function() {
 	});
 	
 	//Activar/desactivar notificaciones
+    //Función hebilitada para "ArreglaSanse"
 	$( ".cat_check" ).click(function(event) {
 		event.preventDefault();
 	    event.stopPropagation();
@@ -622,3 +627,14 @@ window.onload = function() {
 
 };
 
+//GOOGLE CAPTCHA response
+//https://www.youtube.com/watch?v=okaZ6OIqlzs
+function recaptcha_callback(){
+      //alert("callback working");
+	
+	console.log('listo');
+      $('#contact-button').prop("disabled", false);
+      $('#contact-button').removeClass( "cursor_none");
+    }
+
+window.recaptcha_callback = recaptcha_callback;

@@ -7,6 +7,20 @@ c::set('site.auth','Álvaro Holguera');
 //Nombre de la cookie creada por el sitio
 c::set('cookie.user','lupUser');
 
+//Menú de navegación
+c::set('site.nav',array(
+    1 => array(
+        'text' => 'Menú 1',
+        'page' => 'page1.php',
+        'action' => 'p1'
+    ),
+    2 => array(
+        'text' => 'Menú 2',
+        'page' => 'page1.php',
+        'action' => 'p1'
+    )
+));
+
 //MAIL
 //La librería PHPMailer necesita un remitente con un dominio válido, o no funcionará
 c::set('mail.from','noreply@laultimapregunta.com'); //Remitente de los correos enviados automáticamente
@@ -17,14 +31,31 @@ c::set('mail.contact','noreply@laultimapregunta.com');
 ---------------------
 MYSQL
 --------------------
+NOTA: Debe existir la base de datos con la estructura básica para gestionar usuarios
 */
-
+c::set('use.database',true); //Poner TRUE si se quiere habilitar la gestión de usuarios
 c::set('db.host','localhost');
-c::set('db.database','database_name');
+c::set('db.database','database_name'); //Nombre de la Base de Datos
 c::set('db.username','root');
 c::set('db.password','');
 c::set('db.port',3306);
 
+//ADMIN SIDEBAR
+//FA icons available:
+c::set('admin.sidebar',array(
+    1 => array(
+        'text' => 'Admin',
+        'page' => 'admin.php',
+        'icon' => 'home',
+        'action' => ''
+    ),
+    2 => array(
+        'text' => 'Usuarios',
+        'page' => 'users.php',
+        'icon' => 'users',
+        'action' => 'users'
+    )
+));
 
 /*
 ---------------------

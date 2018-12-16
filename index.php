@@ -12,13 +12,13 @@ $site = new Site;
 
 <body>
 
-<?php snippet('nav.php',['menu' => array('Menú 1' => 'menu1.html', 'Menú 2' => 'menu2.html'), 'site' => $site, 'user' => $user]); ?>
+<?php snippet('nav.php',['menu' => c::get('site.nav'), 'sidebar' => c::get('admin.sidebar'), 'site' => $site, 'user' => $user]); ?>
 
 	<div class="container-fluid p-0 m-0">
 		
 		<?php snippet('breadcrumb.php',array('data' => ['Inicio' => 'index.php'])); ?>
 	</div>
-	<div class="container">
+	<div class="container mt-3">
 		
 		<?php snippet('home.php'); ?>
 
