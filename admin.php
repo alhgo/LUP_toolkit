@@ -11,26 +11,45 @@ if(!$user->logged || !$user->is_admin) {
 	url::go('logout.php?error=no_admin');
 }
 
-
+$action = (isset($_GET['action'])) ? $_GET['action'] : '';
 ?>
 
 <?php snippet('header.php', ['site' => $site]); ?>
 
 <body>
 
-<?php snippet('nav.php',['menu' => array('Menú 1' => 'menu1.html', 'Menú 2' => 'menu2.html'), 'site' => $site, 'user' => $user]); ?>
+<?php snippet('nav.php',['menu' => c::get('site.nav'), 'sidebar' => c::get('admin.sidebar'), 'site' => $site, 'user' => $user]); ?>
+	
+	
+	<div class="container p-0 m-0">
+		
+		<!-- Bootstrap row -->
+		<div class="row" id="body-row">
+			
+			<?php snippet('admin/sidebar.php',['sidebar' => c::get('admin.sidebar'), 'user' => $user]) ?>
+			<!-- MAIN -->
+			<div class="col ">
+				<?php 
+                //Diferentes páginas de administración
+				if($action == 'users')
+				{
+					snippet('admin/admin_users.php');
+				}
+				else
+				{
+					snippet('admin/admin_home.php'); 
+				}
+				?>
 
-	<div class="container-fluid p-0 m-0">
+			</div><!-- Main Col END -->
+
+		</div><!-- body-row END -->
 		
-		<?php snippet('breadcrumb.php',array('data' => ['Admin' => 'admin.php'])); ?>
-	</div>
-	<div class="container">
-		
-		<?php snippet('admin/admin_home.php'); ?>
 
 	</div>
 	
-<?php snippet('footer.php', ['libs' => array('forms.js')]); ?>
+	
+<?php snippet('footer.php', ['libs' => array('admin.js')]); ?>
 
 </body>
 </html>
