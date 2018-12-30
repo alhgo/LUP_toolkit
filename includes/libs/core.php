@@ -11,6 +11,11 @@
 
 //Clase que establece las variables y constantes del sitio
 //Inspirado en http://getkirby.com
+
+//Firebase
+use Kreait\Firebase\Factory;
+use Kreait\Firebase\ServiceAccount;
+
 class C {
 
   public static $data = array();
@@ -204,6 +209,34 @@ class Users
 		$db = $this->db;
 		$db->where ("id_user", $id);
 		$user = $db->getOne ("users");
+		
+		//Si se está usando Firebase
+		if(c::get('use.firebase'))
+		{
+			//Comprobamos que el archivo de configuración de Firebas existe
+			if(!is_file(__DIR__.'/../' . c::get('fb.jsonFile')))
+			{
+				url::go('error.php?error=FirebaseFile');
+				
+			}
+			//Añadimos la configuración de marcas de firebase
+			$serviceAccount = ServiceAccount::fromJsonFile(__DIR__.'/../' . c::get('fb.jsonFile'));
+			$firebase = (new Factory)
+				->withServiceAccount($serviceAccount)
+				->withDatabaseUri(c::get('fb.url'))
+				->create();
+
+			$uid = $user['fb_token'];
+
+			//Obtenemos los datos de configuración para visualizar las marcas
+			$database = $firebase->getDatabase();
+			$reference = $database->getReference('users/' . $uid);
+			$value = $reference->getValue();
+			$user['marks_config'] = $value;
+			
+			//Añadimos el Custom Token para poder autenticarse en Firebase
+			$user['custom_token'] = $firebase->getAuth()->createCustomToken($uid);
+		}
 	
 		return $user;
 	}

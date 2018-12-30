@@ -47,6 +47,9 @@
     <script src="js/bootstrap.bundle.min.js"></script>
     <script src="js/cookiealert-standalone.js"></script>
 	<script src="js/popper.min.js"></script>
+	<?php if(c::get('use.firebase',false)) : ?>
+	<script src="js/firebase.js"></script>
+	<?php endif ?>
 	<!--Specific js files-->
 	<?php
 	if(isset($libs) && is_array($libs))

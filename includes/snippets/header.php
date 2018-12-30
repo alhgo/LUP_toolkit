@@ -30,7 +30,10 @@
 	  
 	<?php if(c::get('use.firebase',false)) : ?>
 	<!--Firebase-->
-	<script src="https://www.gstatic.com/firebasejs/5.4.0/firebase.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/5.4.0/firebase-app.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/5.4.0/firebase-auth.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/5.4.0/firebase-database.js"></script>
+	  
 	<script>
 	  // Initialize Firebase
 	  var config = {
@@ -42,6 +45,22 @@
 		messagingSenderId: "<?= c::get('fb.messagingSenderId') ?>"
 	  };
 	  firebase.initializeApp(config);
+	  <?php if($user->logged) : ?> 	
+	  //Auth 
+	  firebase.auth().signInWithCustomToken('<?= $user->user_data['custom_token'] ?>').catch(function(error) {
+	  // Handle Errors here.
+	  var errorCode = error.code;
+	  var errorMessage = error.message;
+	  if(error)
+	  {
+		  alert(errorCode);
+		  //window.location.href = '<?= c::get('site.url') ?>/error.php?error=FirebaseUserLogin&add=errorCode:' + errorCode;
+	  }
+	  // ...
+	});
+	
+	<?php endif ?>
 	</script>
 	<?php endif ?>
-  </head>
+  
+</head>

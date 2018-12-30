@@ -15,7 +15,7 @@ $('input').blur(function(){
   }
 })  
 
-window.onload = function() {
+$(document).ready( function() {
 	
 	/*** LOGIN ***/
 	$( "#login-button" ).click(function(event) {
@@ -620,5 +620,5 @@ window.onload = function() {
 		
 	});
 
-};
+});
 
