@@ -17,6 +17,7 @@ Está basado en parte en un CMS que he utilizado bastante (Kirby), pero que a me
 - Jquery Overlay: https://gasparesganga.com/labs/jquery-loading-overlay/
 - Base de datos en tiempo real firebase: https://firebase.google.com/
 - Librería PHP para poder conectarse con Firebase https://firebase-php.readthedocs.io/en/latest/
+- Mobile Detct: Librería que permite saber si estamos accediendo desde un móvil, una tablet, etc. http://mobiledetect.net/
 
 
 ## Requsitos
