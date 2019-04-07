@@ -14,11 +14,11 @@ if(!$user->logged || !$user->is_admin) {
 $action = (isset($_GET['action'])) ? $_GET['action'] : '';
 ?>
 
-<?php snippet('header.php', ['site' => $site]); ?>
+<?php snippet('admin/admin_header.php', ['site' => $site]); ?>
 
 <body>
 
-<?php snippet('nav.php',['menu' => c::get('site.nav'), 'sidebar' => c::get('admin.sidebar'), 'site' => $site, 'user' => $user]); ?>
+<?php snippet('admin/admin_nav.php',['menu' => '', 'sidebar' => c::get('admin.sidebar'), 'site' => $site, 'user' => $user]); ?>
 	
 	
 	<div class="container p-0 m-0">
@@ -26,7 +26,7 @@ $action = (isset($_GET['action'])) ? $_GET['action'] : '';
 		<!-- Bootstrap row -->
 		<div class="row" id="body-row">
 			
-			<?php snippet('admin/sidebar.php',['sidebar' => c::get('admin.sidebar'), 'user' => $user]) ?>
+			<?php snippet('admin/admin_sidebar.php',['sidebar' => c::get('admin.sidebar'), 'user' => $user]) ?>
 			<!-- MAIN -->
 			<div class="col ">
 				<?php 
@@ -49,7 +49,7 @@ $action = (isset($_GET['action'])) ? $_GET['action'] : '';
 	</div>
 	
 	
-<?php snippet('footer.php', ['libs' => array('admin.js')]); ?>
+<?php snippet('admin/admin_footer.php', ['libs' => array('admin.js')]); ?>
 
 </body>
 </html>

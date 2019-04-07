@@ -8,7 +8,7 @@ $site = new Site;
 
 ?>
 
-<?php snippet('header.php', ['site' => $site]); ?>
+<?php snippet('header.php', ['user'=> $user, 'site' => $site]); ?>
 
 <body>
 

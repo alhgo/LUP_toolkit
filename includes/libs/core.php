@@ -204,6 +204,38 @@ class Users
 		$this->db->disconnect();
 	}
 	
+	//Obtener un array con los tipos de usuario [id] = array(name => 'Nombre', descr => 'Descripción')
+	public function getUsersType()
+	{
+		$users_type = array();
+		$db = $this->db;
+		$t = $db->get('users_type');
+		foreach($t AS $type)
+		{
+			$users_type[$type['id_type']]['name'] = $type['name'];
+			$users_type[$type['id_type']]['descr'] = $type['descr'];
+		}
+		
+		return $users_type;
+	}
+	
+	//Obtener lista de usuarios, con la posibilidad de pasar una condición SQL
+	public function getUsers($cond="")
+	{
+		$db = $this->db;
+		//Si hay condiciones
+		if($cond != '')
+		{
+			$users = $db->rawQuery("SELECT * FROM users " . $cond);
+		}
+		else
+		{
+			$users = $db->get('users');
+		}
+		
+		return $users;
+	}
+	
 	private function getUserData($id)
 	{
 		
@@ -247,6 +279,15 @@ class Users
 		
 		$db = $this->db;
 		$db->where ("username", $username);
+		$user = $db->getOne ("users");
+		return $user;
+	}
+	
+	public function getUserDataById($id)
+	{
+		
+		$db = $this->db;
+		$db->where ("id_user", $id);
 		$user = $db->getOne ("users");
 		return $user;
 	}
@@ -484,12 +525,108 @@ class Users
 		
 	}
 	
+	public function insertUser($data)
+	{
+		//Comprobamos que no existe un isuario con ese correo o nombre de usuario
+		$db = $this->db;
+		$db->where ('username', $data['username']);
+		$result = $this->db->getOne ('users');
+		$c1 = $db->count;
+		
+		$db = $this->db;
+		$db->where ('email', $data['email']);
+		$result = $this->db->getOne ('users');
+		$c2 = $db->count;
+		
+		if ($c1 != 0)
+		{
+			throw new Exception(0);
+		}
+		else if($c2 != 0)
+		{
+			throw new Exception(1);
+		}
+		else
+		{
+			//Datos a insertar
+			$insert = array(
+				'username' => $data['username'],
+				'id_type' => $data['id_type'],
+				'name' => $data['name'],
+				'email' => $data['email'],
+				'password' => md5($data['password']),
+				'birth' => $data['birth'],
+				'admin' => $data['admin'],
+				'time_confirmed' => time()
+			);
+			//Insertamos los datos
+			$id_user = $db->insert ('users', $insert);
+			if(!$id_user)
+			{
+				throw new Exception(2);
+			}
+			else 
+			{	
+				//Si se está usando firebase
+				if(c::get('use.firebase'))
+				{
+					
+					//Si no se encuentra el archivo de configuración indicamos el error
+					if(!is_file(__DIR__.'/../' . c::get('fb.jsonFile')))
+					{
+						url::go('error.php?error=FirebaseFile');
+
+					}
+					//Añadimos la configuración de marcas de firebase
+					$serviceAccount = ServiceAccount::fromJsonFile(__DIR__.'/../' . c::get('fb.jsonFile'));
+					$firebase = (new Factory)
+						->withServiceAccount($serviceAccount)
+						->withDatabaseUri(c::get('fb.url'))
+						->create();
+					$database = $firebase->getDatabase();
+					$newPost = $database
+						->getReference('users')
+						->push([
+							'id' => $id_user,
+							'confirmed' => time(),
+							'username' => $_POST['username']
+						]);
+					//Obtenemos la clave FB
+					$fb_key = $newPost->getKey();
+					//Lo insertamos en la base de datos
+					$user = new Users;
+					$user->userInsertFBtoken($id_user,$fb_key);
+				}
+				return $id_user;
+			}
+			
+		}
+		
+	}
+	
 	//Update user data
-	public function updateUserData($id_user,$data, $mail=false)
+	public function updateUserData($id_user,$data)
 	{
 		$db = $this->db;
+		
+		//Datos a actualizar
+		$update = array(
+			'username' => $data['username'],
+			'id_type' => $data['id_type'],
+			'name' => $data['name'],
+			'email' => $data['email'],
+			'birth' => $data['birth'],
+			'admin' => $data['admin']
+		);
+		
+		//Si se ha pasado una contraseña nueva
+		if(trim($data['password']) != '')
+		{
+			$update['password'] = md5($data['password']);
+		}
+		
 		$db->where ('id_user', $id_user);
-		if ($db->update ('users', $data))
+		if ($db->update ('users', $update))
 		{	
 			return true;
 		}
@@ -497,10 +634,49 @@ class Users
 		{
 			//Insertamos el log
 			log::putErrorLog("Error al actualizar los datos del usuario con ID $id_user (" . $db->getLastError() . ")");
+			throw new Exception(2);
 			return false;
 			
 		}
 		
+	}
+	
+	public function deleteUser($id_user)
+	{
+		//Comprobamos que el usuario existe y obtenemos sus datos
+		$db = $this->db;
+		$db->where('id_user',$id_user);
+		if($user = $db->getOne('users'))
+		{
+			//Si tiene token de Firebase lo obtenemos
+			if(isset($user['fb_token']) && $user['fb_token'] != '')
+			{
+				//Comprobamos que el archivo de configuración de Firebas existe
+				if(!is_file(__DIR__.'/../' . c::get('fb.jsonFile')))
+				{
+					url::go('error.php?error=FirebaseFile');
+
+				}
+				//Añadimos la configuración de marcas de firebase
+				$serviceAccount = ServiceAccount::fromJsonFile(__DIR__.'/../' . c::get('fb.jsonFile'));
+				$firebase = (new Factory)
+					->withServiceAccount($serviceAccount)
+					->withDatabaseUri(c::get('fb.url'))
+					->create();
+				
+				$database = $firebase->getDatabase();
+				//Borramos al apunte del usuario
+				$ref = 'users/' . $user['fb_token'];
+				$database->getReference($ref)->remove();
+			}
+			//Borramos el usuario de la base de datos
+			$db->where('id_user',$id_user);
+			$db->delete('users',1);
+		}
+		else
+		{
+			throw new Exception(4);
+		}
 	}
 	
 	//Función que resetea la contraseña de un usuario
@@ -625,6 +801,29 @@ class Users
 		
 	}
 
+}
+
+
+
+class newsletter
+{
+	public $type = 'text';
+	public $subject;
+	public $body;
+	public $from;
+	
+	public function createNewsletter()
+	{
+		
+		
+	}
+	
+	public function sendNewsletter($id_newsletter,$id_user)
+	{
+		
+		
+	}
+	
 }
 
 class mailBody extends PHPMailer\PHPMailer\PHPMailer

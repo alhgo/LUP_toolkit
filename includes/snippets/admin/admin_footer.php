@@ -43,13 +43,30 @@
 	var siteUrl = '<?= c::get('site.url') ?>';
     </script>
     <!-- Bootstrap core JavaScript -->
-    <script src="js/jquery.min.js"></script>
-    <script src="js/bootstrap.bundle.min.js"></script>
-    <script src="js/cookiealert-standalone.js"></script>
-	<script src="js/popper.min.js"></script>
-	<?php if(c::get('use.firebase',false)) : ?>
-	<script src="js/firebase.js"></script>
+    <script src="js/admin/jquery.min.js"></script>
+    <script src="js/admin/bootstrap.bundle.min.js"></script>
+    <script src="js/admin/cookiealert-standalone.js"></script>
+	<script src="js/admin/popper.min.js"></script>
+
+	<!--Jquery Tables: https://datatables.net/  https://datatables.net/examples/styling/bootstrap4.html-->
+	<script type="text/javascript" charset="utf8" src="plugins/datatables/jquery.dataTables.min.js"></script>
+	<script type="text/javascript" charset="utf8" src="plugins/datatables/dataTables.bootstrap4.min.js"></script>
 	
+	
+<script>
+$(document).ready(function() {
+    
+	$('#users_table').DataTable();
+	
+	
+} );
+</script>
+
+	<!--Notificaciones Noty https://ned.im/noty/#/-->
+	<script src="plugins/noty/noty.js" type="text/javascript"></script>
+
+	<?php if(c::get('use.firebase',false)) : ?>
+	<script src="js/admin/firebase.js"></script>
 	<?php endif ?>
 	<!--Specific js files-->
 	<?php

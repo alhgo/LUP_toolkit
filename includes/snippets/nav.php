@@ -40,7 +40,7 @@ $current = basename( $_SERVER[ 'PHP_SELF' ] );
 				<?php endif ?>
 				<?php if(c::get('use.database')) : ?>
 					<!--User menu-->
-					<?php if($user->logged) : ?>
+					<?php if(isset($user) && $user->logged) : ?>
 						<!-- Dropdown -->
 						<li class="nav-item dropdown">
 							<a class="nav-link <?= ($current == 'user.php' ? 'active' : '') ?> dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown" title="<?= $user->user_data['username'] ?>">

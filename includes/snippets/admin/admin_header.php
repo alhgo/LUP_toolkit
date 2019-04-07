@@ -28,7 +28,15 @@
 	<!-- Scrollbar Custom CSS 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css">-->
 	  
+	<!--Jquery Tables: https://datatables.net/  https://datatables.net/examples/styling/bootstrap4.html-->
+	 <link rel="stylesheet" type="text/css" href="plugins/datatables/dataTables.bootstrap4.min.css">
+	  
+	<!--Notificaciones Noty https://ned.im/noty/#/-->
+	<link href="plugins/noty/noty.css" rel="stylesheet">
+	<link href="plugins/noty/themes/bootstrap-v4.css" rel="stylesheet">
+	  
 	
+	  
 	  
 	<?php if(c::get('use.firebase',false)) : ?>
 	<!--Firebase-->

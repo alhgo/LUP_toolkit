@@ -11,23 +11,26 @@ if(isset($_GET['id']) && isset($_GET['token']))
 	try {
 		$id_user = $user->userConfirmTemp($_GET['id'],$_GET['token']);
 		//Insertamos el usuario en FIREBASE
-		$firebase = (new Factory)
-			->withServiceAccount($serviceAccount)
-			->withDatabaseUri(c::get('fb.url'))
-			->create();
+		if(c::get('use.firebase'))
+		{	
+			$firebase = (new Factory)
+				->withServiceAccount($serviceAccount)
+				->withDatabaseUri(c::get('fb.url'))
+				->create();
 
-		$database = $firebase->getDatabase();
-		$newPost = $database
-			->getReference('users')
-			->push([
-				'id' => $id_user,
-				'confirmed' => time()
-			]);
-		//Obtenemos la clave FB
-		$fb_key = $newPost->getKey();
-		//Lo insertamos en la base de datos
-		$user->userInsertFBtoken($id_user,$fb_key);
-		
+			$database = $firebase->getDatabase();
+			$newPost = $database
+				->getReference('users')
+				->push([
+					'id' => $id_user,
+					'confirmed' => time(),
+					'username' => $_POST['username']
+				]);
+			//Obtenemos la clave FB
+			$fb_key = $newPost->getKey();
+			//Lo insertamos en la base de datos
+			$user->userInsertFBtoken($id_user,$fb_key);
+		}
 		//Enviamos el aviso
 		$result_title = 'USUARIO REGISTRADO';
 		$result_text = 'El proceso de registro ha terminado correctamente.';
