@@ -55,10 +55,12 @@
 	
 <script>
 $(document).ready(function() {
-    
+    //Activamos las tablas
 	$('#users_table').DataTable();
-	
-	
+	//Activamos los tooltpis
+	$(function () {
+	  $('[data-toggle="tooltip"]').tooltip()
+	})
 } );
 </script>
 
@@ -75,14 +77,10 @@ $(document).ready(function() {
 		foreach($libs AS $lib)
 		{
 			echo '
-	<script src="js/' . $lib . '"></script>';
+	<script src="js/admin/' . $lib . '"></script>';
 		}
 	}
 
 	
 	
 	?>
-
-
-
-  

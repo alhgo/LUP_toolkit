@@ -210,11 +210,17 @@ class Users
 		$users_type = array();
 		$db = $this->db;
 		$t = $db->get('users_type');
+		
+		//Añadimos uno para los que no están definidos
+		$users_type[0]['name'] = 'Sin definir';
+		$users_type[0]['descr'] = 'Usuario sin definir';
+		
 		foreach($t AS $type)
 		{
 			$users_type[$type['id_type']]['name'] = $type['name'];
 			$users_type[$type['id_type']]['descr'] = $type['descr'];
 		}
+		
 		
 		return $users_type;
 	}
@@ -807,31 +813,360 @@ class Users
 
 class newsletter
 {
-	public $type = 'text';
-	public $subject;
+	public $format = 'html';
+	public $title;
 	public $body;
 	public $from;
+	public $id_user;
+	public $id_newsletter;
 	
-	public function createNewsletter()
+	function __construct()
 	{
+		//Obtenemos los datos del sitio
+		$site = new Site;
+		
+		//Conectamos con la base de datos
+		$this->db = new MysqliDb (Array (
+                'host' => c::get('db.host'),
+                'username' => c::get('db.username'), 
+                'password' => c::get('db.password'),
+                'db'=> c::get('db.database'),
+                'port' => 3306,
+                'prefix' => '',
+                'charset' => 'utf8'));
+		
+	}
+	
+	function __destruct(){
+		$this->db->disconnect();
+	}
+	
+	//Generador de tokens. Opcional: longitud en nº
+	private function generateToken($length='')
+	{
+		$token = md5(uniqid(rand(), true));
+		if($length != '' && is_numeric($length))
+		{
+			$token = substr($token,0,$length);
+		}
+		return $token;
+	}
+	
+	public function insertNewsletter($data)
+	{
+		//Datos a insertar
+		$token = $this->generateToken(30);
+		$insert = array(
+			'id_nl' => null,
+			'token' => $token,
+			'format' => $data['format'],
+			'title' => $data['title'],
+			'body' => $data['body'],
+			'image' => $data['image'],
+			'button_link' => $data['button_link'],
+			'id_cats' => $data['id_cats'],
+			'test_email' => $data['test_email'],
+			'time' => time()
+		);
+		//Insertamos los datos
+		$db = $this->db;
+		
+		$id_nl = $db->insert ('newsletter', $insert);
+		if(!$id_nl)
+		{
+			throw new Exception('Se ha producido un error al insertar el newsletter');
+		}
+		else 
+		{
+			//Insertamos los usuarios que deberán recibir el newsletter
+			//Si es 0, se envía a los administradores
+			if($data['id_cats'] == NULL)
+			{
+				$db->where ("admin", 1);
+				$cols = array ("id_user");
+				$users = $db->get ("users",null,$cols);
+				$token = $this->generateToken(30);
+				
+				if ($db->count > 0)
+					foreach ($users as $user) { 
+						//Insertamos el usuario a recibir el newsletter
+						$user_insert = array(
+							'id' => null,
+							'id_nl' => $id_nl,
+							'id_user' => $user['id_user'],
+							'status' => 0,
+							'log' => 'Pendiente de enviar',
+							'token' => $token
+						);
+						
+						$db->insert ('newsletter_send',$user_insert);
+					}
+			}
+			else
+			{
+				$array_cats = explode(',',$data['id_cats']);
+				foreach($array_cats AS $cat)
+				{
+					$db->where ("id_type", $cat);
+					//Si la categoría es 0, aceptamos también una categoría vacía
+					if($cat == 0)
+					{
+						$db->orWhere ("id_type", '');
+						$db->orWhere ("id_type", NULL);
+					}
+					$cols = array ("id_user");
+					$users = $db->get ("users",null,$cols);
+					if ($db->count > 0)
+						foreach ($users as $user) { 
+							//Insertamos el usuario a recibir el newsletter
+							$token = $this->generateToken(30);
+							$user_insert = array(
+								'id' => null,
+								'id_nl' => $id_nl,
+								'id_user' => $user['id_user'],
+								'status' => 0,
+								'log' => 'Pendiente de enviar',
+								'token' => $token
+							);
+
+							$db->insert ('newsletter_send',$user_insert);
+						}
+				}
+			}
+			
+			return $id_nl;
+		}
+	}
+	
+	//Función que devueve los datos de los newsletter (de uno si se pasa el ID, el cual estará en el índice 0)
+	public function getNewsletters($id='')
+	{
+		
+		$db = $this->db;
+		$return = array();
+		if($id != '' && is_numeric($id))
+		{
+			$db->where('id_nl',$id);
+			$return = $db->get('newsletter');
+		}
+		else
+		{
+			$return = $db->get('newsletter');
+		}
+		
+		return $return;
 		
 		
 	}
 	
-	public function sendNewsletter($id_newsletter,$id_user)
+	//Función que borra todos los newsletter y los envíos
+	public function deleteNewsletter($id='')
 	{
 		
+		$db = $this->db;
+		$db->where('id_nl',$id);
+		$newsletter = $db->get('newsletter');
+		
+		if(count($newsletter > 0))
+		{
+			//Borramos el newsletter
+			$db->where('id_nl',$id);
+			$db->delete('newsletter');
+			//Borramos los envíos
+			$db->where('id_nl',$id);
+			$db->delete('newsletter_send');
+		}
+		else
+		{
+			throw new Exception("No se ha encontrado un newsletter con ID: " . $id);
+		}
+			
 		
 	}
+	
+	
+	//Función que devuelve un array con los datos de los nl enviados:
+	//dest => nº de destinatarios
+	//sent => correos enviados
+	//error => nº de errores producidos
+	public function getNewsletterSent($id)
+	{
+		$return = array();
+		
+		$db = $this->db;
+		$db->where('id_nl',$id);
+		$db->get('newsletter_send');
+		
+		$return['dest'] = $db->count;
+		
+		$db->where('id_nl',$id);
+		$db->where('status',1);
+		$db->get('newsletter_send');
+		
+		$return['sent'] = $db->count;
+		
+		
+		$db->where('id_nl',$id);
+		$db->where('status',2);
+		$db->get('newsletter_send');
+		
+		$return['error'] = $db->count;
+		
+		return $return;
+	}
+	
+	//Función que devuelve un array con los destinatarios de un newsletter
+	public function getNewsletterDest($id)
+	{
+		$db = $this->db;
+		$db->where('id_nl',$id);
+		$dest = $db->get('newsletter_send');
+		
+		return $dest;
+	}
+	
+	//Establecemos el usuario y el newsletter según el apunte en la base de datos
+	public function setNewsletterData($id,$token)
+	{
+		$db = $this->db;
+		$db->where('id',$id);
+		$db->where('token',$token);
+		$data = $db->get('newsletter_send',1);
+		if($db->count > 0)
+		{
+			$this->id_user = $data[0]['id_user'];
+			$this->id_newsletter = $data[0]['id_nl'];
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	public function sendNewsletter($id_user,$id_newsletter,$mailto=false)
+	{
+		
+		//Enviamos el correo
+		//Declaramos las clases	
+		$mail = new PHPMailer(true);
+		//Desactivamos el modo de debug para que no muestre errores
+		$mail->SMTPDebug = false;
+		$mail->do_debug = 0;
+
+		//Construimos el cuerpo
+		$nl = new newsletter;
+		$db = $this->db;
+		//Obtenemos los datos del newsletter
+		$nl_data = $this->getNewsletters($id_newsletter);
+		if(count($nl_data) == 0)
+		{	
+			throw new Exception("No se ha encontrado un newsletter con ID: " . $id_newsletter);
+		}
+		else
+		{
+			$nl_data = $nl_data[0];
+			//Construimos el cuerpo
+			$body = new mailBody; 
+			//Construimos el texto de previo para algunos clientes
+			$body->bodyPreheader = $nl_data['title'] . "
+			
+			Si no puedes ver correctamente este correo, visite la página " . c::get('site.url') . 'newsletter.php?id=' . $id_newsletter;
+			$body->bodyTitle = $nl_data['title'];
+			//Construimos el cuerpo, declarando antes el botón para que se muestre
+			$body->buttonLink = $nl_data['button_link'];
+			$body->buttonText = 'Pincha aquí';
+			$body->bodyContent = $nl_data['body'];
+			$body->bodyImage = $nl_data['image'];
+			$body->getBodyHTML();
+			
+			//Datos del correo
+			$mail->setFrom(c::get('mail.from'), c::get('mail.fromName'));
+			//Destinatario, si no se ha especificado uno lo obtenemos de la base de datos
+			if($mailto)
+			{
+				$mail->addAddress($mailto);
+			}
+			else
+			{
+				//Obtenemos el correo del usuario a partir de la tabla que vincula newsletter con usuarios
+				
+				$db->where('id_user',$id_user);
+				$data = $db->get('users',1);
+				if($db->count > 0)
+				{
+					$mail->addAddress($data[0]['email']);
+				}
+				else
+				{
+					throw new Exception("No se ha encontrado un usuario con ID: " . $id_user);
+				}
+			}
+				
+			//Construimos el resto de la configuración del correo
+			$mail->Subject  = $nl_data['title'];
+			if($nl_data['format'] == 'html')
+			{
+				$mail->isHTML(true); //Indicamos que es un correo HTML
+				$mail->Body = $body->bodyHTML; //Insertamos el cuerpo construido previamente
+			}
+			else
+			{
+				$mail->Body = $nl_data['body']; 	
+			}
+
+			$mail->CharSet = 'UTF-8'; //Convertimos los caracteres a UTF8
+
+			//Enviamos el correo y comprobamos que se ha mandado correctamente	
+
+			try {
+				//Desactivamos los errores de la clase PHP Mailer
+				@$mail->send();
+				//Si ha ido bien, actualizamos los datos
+				$data_update = Array (
+					'status' => '1',
+					'log' => 'Enviado'
+					);
+				$db->where ('id_user', $id_user);
+				$db->where ('id_nl', $id_newsletter);
+				$db->update ('newsletter_send', $data_update);
+
+			} catch (Exception $e) {
+				//Insertamos un mensaje de error en el LOG
+				$error_msg = 'Se ha producido un error al enviar el newsletter (ID: ' . $id_newsletter . '). Código de error: ' . $mail->ErrorInfo;
+				log::putErrorLog($error_msg);
+				//Actualizamos la base de datos con el estado de error
+				$data_update = Array (
+					'status' => '2',
+					'log' => $mail->ErrorInfo
+					);
+				$db->where ('id_user', $id_user);
+				$db->where ('id_nl', $id_newsletter);
+				$db->update ('newsletter_send', $data_update);
+
+				throw new Exception($mail->ErrorInfo);
+
+			}
+			
+			
+			
+		}
+
+	}
+	
 	
 }
 
-class mailBody extends PHPMailer\PHPMailer\PHPMailer
+class mailBody extends PHPMailer
 {
 	
 	public $bodyHTML;
 	public $bodyPreheader; //Texto invlisible en el correo pero que algunos clientes muestran como previo
+	public $bodyTitle;
 	public $bodyContent;
+	public $bodyImage;
+	public $buttonLink;
+	public $buttonText;
 
 	public function getBodyHTML()
 	{
@@ -839,13 +1174,33 @@ class mailBody extends PHPMailer\PHPMailer\PHPMailer
 		$this->bodyHTML = file_get_contents(__DIR__ . '/../templates/mail_html_basic.html');
 		
 		//Sustituimos los contenidos
-		$array_search = array('{{preheader}}','{{site.url}}','{{site.title}}','{{site.auth}}','{{content}}');
-		$array_replace = array($this->bodyPreheader,c::get('site.url'),c::get('site.title'),c::get('site.auth'),$this->bodyContent);
+		//Si existe un enlace para el botón, se pone
+		if($this->buttonLink != '')
+		{
+			$button_text = ($this->buttonText != '') ? $this->buttonText : 'Pinchar aquí';
+			$button_content = $this->bodyButton($this->buttonLink, $button_text);
+		}
+		else
+		{
+			$button_content = '';
+		}
+		
+		//Si existe una imagen en el newsletter
+		if($this->bodyImage != '')
+		{
+			$image_content = '<img src="' . $this->bodyImage . '" width="100%" alt="imagen">';
+		}
+		else
+		{
+			$image_content = '';
+		}
+		$array_search = array('{{preheader}}','{{site.url}}','{{site.title}}','{{site.auth}}','{{title}}','{{content}}','{{image}}','{{button}}');
+		$array_replace = array($this->bodyPreheader,c::get('site.url'),c::get('site.title'),c::get('site.auth'),$this->bodyTitle,$this->bodyContent, $image_content, $button_content);
 		
 		$this->bodyHTML = str_replace($array_search,$array_replace,$this->bodyHTML);
 	}
 	
-	public function bodyButton($link,$text)
+	private function bodyButton($link,$text)
 	{
 		
 		$return = '<table border="0" cellpadding="0" cellspacing="0" class="btn btn-primary" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; box-sizing: border-box;">

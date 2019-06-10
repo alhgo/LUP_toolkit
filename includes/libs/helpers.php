@@ -27,7 +27,8 @@ function create_link($data) {
 	else
 	{
 		$action = (isset($data['action']) && $data['action'] != '') ? '?action=' . $data['action'] : '';
-		$link = 'admin.php' . $action;
+		$sub = (isset($data['sub']) && $data['sub'] != '') ? '&sub=' . $data['sub'] : '';
+		$link = 'admin.php' . $action . $sub;
 	}
 	
 	return $link;
@@ -63,6 +64,47 @@ function createSnack($text,$type='success',$layout='topRight',$timeout=4000,$pro
 	}
 	
 }
+
+//Función que lee todas las imágenes de una carpeta. En un array con las claves:
+/*
+- file: nombre del archivo
+- ext: extensión
+- uri: enlace relativo al archivo
+- url: enlace absoluto, incluyendo la URL del site
+*/
+function getImages($dir)
+{
+	$images = array();
+	if(is_dir($dir))
+	{
+
+		$all_files = glob($dir . "/*.*");
+
+		for ($i=0; $i<count($all_files); $i++)
+		{
+		  $image_name = $all_files[$i];
+		  $supported_format = array('gif','jpg','jpeg','png');
+		  $ext = strtolower(pathinfo($image_name, PATHINFO_EXTENSION));
+		  if (in_array($ext, $supported_format))
+			  {
+				//echo '<img src="'.$image_name .'" alt="'.$image_name.'" />'."<br /><br />";
+				  $images[] = [
+					  'file' => str_replace($dir . '/','',$image_name) ,
+					  'ext' => $ext,
+					  'uri' => $image_name,
+					  'url' => c::get('site.url') . $image_name
+				  ];
+			  } else {
+				  continue;
+			  }
+		}
+	}
+	return $images;
+}
+
+  
+
+
 
 
 ?>

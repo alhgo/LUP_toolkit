@@ -11,10 +11,8 @@ if(isset($_POST['insert_user']))
 {
 	//print_r($_POST);
 	//Si no se ha marcado la casilla de administrador
-	if(!isset($_POST['admin']))
-	{
-		$_POST['admin'] = 0;
-	}
+	$_POST['admin'] = (isset($_POST['admin'])) ? $_POST['admin'] : 0;
+	
 	try {
 		$id_user = $user->insertUser($_POST);
 		$success = 'Usuario insertado';
@@ -23,17 +21,15 @@ if(isset($_POST['insert_user']))
 	}
 	catch(Exception $e) {
 		$error_code = $e->getMessage();
-		$error = $user->getErrorCode($error_code);
+		$ec = $user->getErrorCode($error_code);
+		$error = "Problema. " . $ec['title'];
 	}
 }
 //-- ACTUALIZAR USUARIO -- //
 elseif(isset($_POST['update_user']))
 {
 	//Si no se ha marcado la casilla de admin
-	if(!isset($_POST['admin']))
-	{
-		$_POST['admin'] = 0;
-	}
+	$_POST['admin'] = (isset($_POST['admin'])) ? $_POST['admin'] : 0;
 	
 	//Insertamos los datos
 	try {
@@ -42,7 +38,8 @@ elseif(isset($_POST['update_user']))
 	}
 	catch(Exception $e) {
 		$error_code = $e->getMessage();
-		$error = $user->getErrorCode($error_code);
+		$ec = $user->getErrorCode($error_code);
+		$error = "Problema. " . $ec['title'];
 	}
 }
 elseif($sub == 'delete_user' && isset($_GET['id']))
@@ -56,7 +53,7 @@ elseif($sub == 'delete_user' && isset($_GET['id']))
 	catch(Exception $e) {
 		$error_code = $e->getMessage();
 		$ec = $user->getErrorCode($error_code);
-		$error = "Problema: " . $ec['title'];
+		$error = "Problema. " . $ec['title'];
 	}
 }
 ?>

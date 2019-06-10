@@ -28,12 +28,16 @@ $action = (isset($_GET['action'])) ? $_GET['action'] : '';
 			
 			<?php snippet('admin/admin_sidebar.php',['sidebar' => c::get('admin.sidebar'), 'user' => $user]) ?>
 			<!-- MAIN -->
-			<div class="col ">
+			<div class="col admin-container ">
 				<?php 
                 //Diferentes páginas de administración
 				if($action == 'users')
 				{
 					snippet('admin/admin_users.php');
+				}
+				else if($action == 'newsletter')
+				{
+					snippet('admin/admin_newsletter.php');
 				}
 				else
 				{

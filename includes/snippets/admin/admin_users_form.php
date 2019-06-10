@@ -83,6 +83,7 @@ else
     <label for="id_type" class="col-sm-4 col-form-label text-right">Categoría de usuario</label>
     <div class="col-sm-8">
       <select class="form-control" id="id_type" name="id_type">
+		  <option value="">Categoría</option>
 		<?php foreach($users_type AS $key => $value) : ?>
 		  <option value="<?= $key ?>" <?php echo (is_array($u) && $u['id_type'] == $key) ? 'selected' : '' ?>><?= $value['name'] ?></option>
 		<?php endforeach ?>

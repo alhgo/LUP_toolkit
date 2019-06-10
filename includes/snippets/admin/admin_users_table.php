@@ -4,7 +4,6 @@ $users = $u->getUsers();
 
 //Obtenemos los tipos de usuarios
 $users_type = $u->getUsersType();
-
 //print_r($users);
 ?>
 

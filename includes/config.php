@@ -1,6 +1,7 @@
 <?php 
 //Configuración básica de la página
 c::set('site.title','LA ÚLTIMA PREGUNTA');
+c::set('site.url','');
 c::set('site.descr','Toolkit desarrollado por La Última Pregunta');
 c::set('site.auth','Álvaro Holguera');
 
@@ -41,21 +42,41 @@ c::set('db.password','');
 c::set('db.port',3306);
 
 //ADMIN SIDEBAR
-//FA icons available:
+//FA icons available: https://fontawesome.com/icons
 c::set('admin.sidebar',array(
     1 => array(
         'text' => 'Admin',
         'page' => 'admin.php',
-        'icon' => 'home',
+        'icon' => 'wrench',
         'action' => ''
     ),
     2 => array(
         'text' => 'Usuarios',
-        'page' => 'users.php',
+        'page' => 'admin.php',
         'icon' => 'users',
         'action' => 'users'
-    )
-));
+    ),
+	3 => array(
+		'text' => 'Newsletter',
+		'icon' => 'envelope',
+		'action' => 'newsletter',
+		'submenu' => array(
+			1 => array(
+				'text' => 'Crear',
+				'page' => 'admin.php',
+				'action' => 'newsletter'
+				),
+			2 => array(
+				'text' => 'Listado',
+				'page' => 'admin.php',
+				'action' => 'newsletter',
+				'sub' => 'newsletter_list'
+				)
+			)
+		)
+		
+	)
+);
 
 /*
 ---------------------
@@ -63,7 +84,7 @@ FIREBASE
 --------------------
 */
 
-c::set('use.firebase',false); //Cambiar a false si no se usará BD Firebase
+c::set('use.firebase',false); //Cambiar a true si se quiere usar la BD Firebase
 c::set('fb.url','https://your_firebase_database.firebaseio.com/'); //Cambiar por la URL de la BD
 
 //Archivo de config en carpeta includes. 

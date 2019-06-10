@@ -34,3 +34,25 @@ function SidebarCollapse () {
     // Collapse/Expand icon
     $('#collapse-icon').toggleClass('fa-angle-double-left fa-angle-double-right');
 }
+
+
+
+//* NEWSLETTER *//
+$(document).ready( function() {
+	
+	//Select all
+	$( "#select_all_cats" ).click(function(event) {
+		event.preventDefault();
+		
+		var options = document.getElementById("nl_users_cats");
+    	for ( i=0; i<options.length; i++)
+    	{
+    		options[i].selected = "true";
+    	}
+		
+
+		return false;
+	});
+	
+});
+		
