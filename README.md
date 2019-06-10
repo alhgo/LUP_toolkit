@@ -19,6 +19,7 @@ Está basado en parte en un CMS que he utilizado bastante (Kirby), pero que a me
 - Mobile Detct: Librería que permite saber si estamos accediendo desde un móvil, una tablet, etc. http://mobiledetect.net/
 - Tablas Jquery: www.datatables.net
 - Notificaciones tipo snack: https://ned.im/noty/#/
+- Editor HTML WYSIWYG: http://nicedit.com/index.php
 
 
 ## Requsitos
