@@ -64,7 +64,8 @@ c::set('admin.sidebar',array(
 			1 => array(
 				'text' => 'Crear',
 				'page' => 'admin.php',
-				'action' => 'newsletter'
+				'action' => 'newsletter',
+				'sub' => 'newsletter_create'
 				),
 			2 => array(
 				'text' => 'Listado',

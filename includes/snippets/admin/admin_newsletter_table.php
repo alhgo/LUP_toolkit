@@ -89,6 +89,6 @@ $user_cats[0] = "Sin definir";
         </tfoot>
     </table>
 </div>
-<p align="center"><a href="admin.php?action=newsletter" type="button" class="btn btn-primary">Crear newsletter</a></p>
+<p align="center"><a href="admin.php?action=newsletter&sub=newsletter_create" type="button" class="btn btn-primary">Crear newsletter</a></p>
 <p></p>
 <p></p>

@@ -24,7 +24,7 @@ $users_type = $user->getUsersType();
 	  <option value="<?= $key ?>"><?= $value['name'] ?></option>
       <?php endforeach ?>
     </select>
-	  <small class="form-text text-muted"><a href="#" id="select_all_cats">Seleccionar todos</a> - (si no se selecciona ninguno, solo se enviará a los administradores)</small>
+	  <small class="form-text text-muted"><a href="#" id="select_all_cats">Seleccionar todos - Alt+click oara deseleccionar</a><br>(si no se selecciona ninguno, solo se enviará a los administradores)</small>
   </div>
   <hr>	
   <div class="form-group">	

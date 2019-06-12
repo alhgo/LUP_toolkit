@@ -83,9 +83,9 @@ elseif($success != '')
 
 <?php
 //Página a mostrar
-if($sub == 'newsletter_list')
+if($sub == 'newsletter_create')
 {
-	snippet('admin/admin_newsletter_table.php'); 
+	snippet('admin/admin_newsletter_form.php'); 
 }
 else if($sub == 'insert' && $error == '' && is_numeric($id_nl))
 {
